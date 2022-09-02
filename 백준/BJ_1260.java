@@ -1,9 +1,10 @@
-package ws0819;
+package bj;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -11,73 +12,69 @@ import java.util.StringTokenizer;
 
 //DFS와 BFS
 public class BJ_1260 {
-	
 	static int N, M, V;
-	static List<List<Integer>> adjList;
+	static List<Integer>[] adjList;
+	static boolean[] visited;
 	
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-		String input = br.readLine();
-		StringTokenizer st = new StringTokenizer(input, " ");
-		
+		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
 		N = Integer.parseInt(st.nextToken());
 		M = Integer.parseInt(st.nextToken());
-		V = Integer.parseInt(st.nextToken());
-		adjList = new ArrayList<>();
+		V= Integer.parseInt(st.nextToken());		//시작 정점
 		
-		for(int i=0; i<N+1; i++) {
-			adjList.add(new ArrayList<>()); 
+		adjList = new ArrayList[N+1];
+		
+		for(int i=1; i<=N; i++) {
+			adjList[i] = new ArrayList<>();
 		}
 		
-		for(int i=0; i<M; i++) {
-			input = br.readLine();
-			st = new StringTokenizer(input, " ");
-			
+		for(int i=0; i<M; i++) {		//정점 입력
+			st = new StringTokenizer(br.readLine(), " ");
 			int from = Integer.parseInt(st.nextToken());
 			int to = Integer.parseInt(st.nextToken());
 			
-			adjList.get(from).add(to);
-			adjList.get(to).add(from);
+			adjList[from].add(to);
+			adjList[to].add(from);
 		}
 		
-		for(int i=0; i<N+1; i++) {
-			adjList.get(i).sort((o1, o2) -> o1 - o2); 
+		for(int i=1; i<=N; i++) {		//적은 번호 먼저 탐색
+			Collections.sort(adjList[i]);
 		}
 		
-		dfs(V, new boolean[N+1]);
+		visited = new boolean[N+1];
+		dfs(V);
 		System.out.println();
-		bfs(new boolean[N+1]);
-		System.out.println();
+		
+		visited = new boolean[N+1];
+		bfs(V);
 	}
 	
-	static void dfs(int vertex, boolean[] visited) {
-		visited[vertex] = true;
-		System.out.print(vertex + " ");
+	static void dfs(int v) {
+		visited[v] = true;
+		System.out.print(v + " ");
 		
-		List<Integer> list = adjList.get(vertex);
-		int size = list.size();
-		
-		for(int to : list) {
-			if(visited[to])continue;
-			dfs(to, visited);
+		for(int i=0, size=adjList[v].size(); i<size; i++) {
+			int to = adjList[v].get(i);
+			if(visited[to]) continue;
+			dfs(to);
 		}
 	}
-	
-	static void bfs(boolean[] visited) {
-		Queue<Integer> que = new LinkedList<>();
-		que.add(V);
-		visited[V] = true;
+	static void bfs(int v) {
+		Queue<Integer> q = new LinkedList<>();
+		q.add(v);
+		visited[v] = true;
 		
-		while(!que.isEmpty()) {
-			int from = que.poll();
-			System.out.print(from + " ");
+		while(!q.isEmpty()) {
+			int now = q.poll();
+			System.out.print(now + " ");
 			
-			List<Integer> fromList = adjList.get(from);
-			for(int to : fromList) {
+			for(int i=0, size=adjList[now].size(); i<size; i++) {
+				int to = adjList[now].get(i);
 				if(visited[to]) continue;
-				que.offer(to);
 				visited[to] = true;
+				q.add(to);
 			}
 		}
 	}
