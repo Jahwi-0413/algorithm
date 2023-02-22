@@ -1,4 +1,6 @@
-const input = require("fs")
+import fs from "fs";
+
+const input: string[] = fs
   .readFileSync("./input/BJ_10807.txt")
   .toString()
   .split("\n");
